@@ -3,14 +3,24 @@ package jwt
 import (
 	"errors"
 	"localhost/models"
+	"os"
 	"strings"
 
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
 )
 
-var secretKey = []byte("mySuperSecretKEY123")
+var secretKey []byte
+
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic("couldn't load")
+	}
+	secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+}
 
 func GenerateJWT(u models.User) (string, error) {
 	payload := jwt.MapClaims{

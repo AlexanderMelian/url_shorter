@@ -16,7 +16,7 @@ func Login(c *gin.Context) {
 	var inp models.LoginInput
 
 	if err := c.ShouldBindJSON(&inp); err != nil {
-		c.JSON(http.StatusBadRequest, "StatusBadRequest")
+		c.JSON(http.StatusBadRequest, "Bad Json")
 		return
 	}
 	if inp.Username == "" || inp.Password == "" {

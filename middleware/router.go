@@ -13,12 +13,12 @@ func Routers() {
 	login.POST("/", Login)
 
 	public := router.Group("/user")
-	public.GET("/", controller.FindAll)
 	public.POST("/", controller.Create)
 
 	protected := router.Group("/user")
 	protected.Use(Handler())
-	protected.GET("/:id", controller.FindById)
+	protected.GET("/", controller.FindAll)
+	//protected.GET("/:id", controller.FindById)
 
 	router.Run("localhost:8080")
 }
