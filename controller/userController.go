@@ -16,9 +16,9 @@ func UserController(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-func FindAll(c *gin.Context) {
+func FindAllUsers(c *gin.Context) {
 
-	users, flag := service.FindAll()
+	users, flag := service.FindAllUsers()
 
 	if !flag {
 		c.JSON(http.StatusOK, gin.H{"users": "Not found"})
@@ -27,14 +27,14 @@ func FindAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
-func FindById(c *gin.Context) {
+func FindUserById(c *gin.Context) {
 	idstr := c.Param("id")
 	id, err := strconv.ParseUint(idstr, 10, 64)
 	if err != nil {
 		c.String(http.StatusBadRequest, "BAD REQUEST")
 	}
 
-	user, flag := service.FindById(uint(id))
+	user, flag := service.FindUserById(uint(id))
 
 	if !flag {
 		c.String(http.StatusOK, "NOT FOUND")
@@ -43,7 +43,7 @@ func FindById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": user})
 }
 
-func Create(c *gin.Context) {
+func CreateUser(c *gin.Context) {
 	var input models.User
 
 	if err := c.ShouldBindJSON(&input); err != nil {

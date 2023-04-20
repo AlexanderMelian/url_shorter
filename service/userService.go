@@ -9,14 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func FindAll() (*[]models.User, bool) {
+func FindAllUsers() (*[]models.User, bool) {
 	db := setup.DB
 	var users []models.User
 	db.Find(&users)
 	return &users, true
 }
 
-func FindById(id uint) (*models.User, bool) {
+func FindUserById(id uint) (*models.User, bool) {
 	db := setup.DB
 	var user models.User
 	db.First(&user, id)

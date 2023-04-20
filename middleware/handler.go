@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"localhost/jwt"
 	"net/http"
 
@@ -18,8 +17,6 @@ func Handler() gin.HandlerFunc {
 			return
 		}
 		err := jwt.ValidateAuthToken(cookie)
-
-		fmt.Println(err)
 
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)

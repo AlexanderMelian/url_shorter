@@ -8,4 +8,5 @@ type User struct {
 	Name     string `json:"name"`
 	LastName string `json:"last_name"`
 	Password string `json:"password"`
+	//UrlShorted []TinyUrl `gorm:"ForeignKey:UserID"json:"url_shorted"`
 }

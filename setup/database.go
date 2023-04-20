@@ -33,6 +33,7 @@ func Connect() error {
 		return err
 	}
 	database.AutoMigrate(&models.User{})
+	database.AutoMigrate(&models.TinyUrl{})
 	DB = database
 	return nil
 }
