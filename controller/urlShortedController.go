@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"localhost/models"
 	"localhost/service"
 	"net/http"
@@ -24,8 +23,17 @@ func CreateUrlShorted(c *gin.Context) {
 	}
 
 	hashedPassword := generateShortUrl(input.Url)
-	fmt.Println(c)
 	service.SaveUrlShorted(hashedPassword, input.Url)
+}
+
+func DeleteUrlShorted(c *gin.Context) {
+	url := c.Param("url")
+	err := service.DeleteUrlShorted(url)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, "Error deleting")
+		return
+	}
+	c.JSON(http.StatusOK, "OK")
 }
 
 func generateShortUrl(url string) string {

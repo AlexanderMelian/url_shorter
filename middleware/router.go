@@ -20,9 +20,10 @@ func Routers() {
 	protectedUser.GET("/", controller.FindAllUsers)
 	//protected.GET("/:id", controller.FindById)
 
-	protectedShorted := router.Group("/")
+	protectedShorted := router.Group("/shorter")
 	protectedShorted.Use(Handler())
 	protectedShorted.POST("/", controller.CreateUrlShorted)
+	protectedShorted.DELETE("/:url", controller.DeleteUrlShorted)
 
 	router.Run("localhost:8080")
 }
