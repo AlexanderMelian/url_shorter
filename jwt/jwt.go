@@ -2,10 +2,11 @@ package jwt
 
 import (
 	"errors"
+	"fmt"
 	"localhost/models"
+	"localhost/service"
 	"os"
 	"strings"
-
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -23,13 +24,11 @@ func init() {
 }
 
 func GenerateJWT(u models.User) (string, error) {
-	payload := jwt.MapClaims{
-		"username": u.Username,
-		"email":    u.Email,
-		"expires":  time.Now().UTC().Add(time.Hour * 24),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	claims["username"] = u.Username
+	claims["email"] = u.Email
 	tokenStr, err := token.SignedString(secretKey)
 	if err != nil {
 		return tokenStr, err
@@ -40,8 +39,7 @@ func GenerateJWT(u models.User) (string, error) {
 
 // only return if token is not valid
 func ValidateAuthToken(signedToken string) error {
-	claims := &models.Claim{}
-
+	claims := &jwt.MapClaims{}
 	splitedToken := strings.Split(signedToken, "Bearer ")
 
 	token, er := jwt.ParseWithClaims(
@@ -51,12 +49,33 @@ func ValidateAuthToken(signedToken string) error {
 			return secretKey, nil
 		},
 	)
+
 	if er != nil {
 		return er
 	}
-
 	if !token.Valid {
 		return errors.New("TOKEN NOT VALID")
 	}
 	return nil
+}
+
+func GetUserId(signedToken string) (uint, error) {
+	signedToken = strings.Replace(signedToken, "Bearer ", "", 1)
+	var name string
+	token, _, err := new(jwt.Parser).ParseUnverified(signedToken, jwt.MapClaims{})
+	if err != nil {
+		return 0, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		name = fmt.Sprint(claims["username"])
+	}
+	if name == "" {
+		return 0, errors.New("invalid token payload")
+	}
+	uId, find := service.FindByUsername(name)
+	if !find {
+		return 0, errors.New("Invalid username")
+	}
+	return uId.ID, nil
 }

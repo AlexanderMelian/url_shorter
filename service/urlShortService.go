@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"localhost/models"
 	"localhost/setup"
 	"time"
@@ -9,13 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func SaveUrlShorted(urlShorted string, url string) {
+func SaveUrlShorted(urlShorted string, url string, uId uint) {
 	db := setup.DB
 	tinyUrl := &models.TinyUrl{
 		UrlShorted:  urlShorted,
 		UrlOriginal: url,
 		LastUsed:    time.Now(),
-		UserId:      0,
+		UserId:      uId,
 	}
 
 	result := db.Create(tinyUrl)
@@ -47,4 +48,11 @@ func FindUrlByShorted(shorted string) (*models.TinyUrl, bool) {
 	}
 	return &sh, true
 
+}
+
+func UpdateLastUsedFromUrl(urlModel models.TinyUrl) {
+	db := setup.DB
+	urlModel.LastUsed = time.Now()
+	fmt.Println(urlModel)
+	db.Save(&urlModel)
 }

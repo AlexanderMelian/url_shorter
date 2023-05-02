@@ -2,11 +2,19 @@ package middleware
 
 import (
 	"localhost/controller"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func Routers() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		return
+	}
+
+	host := os.Getenv("HOST")
 	router := gin.Default()
 
 	login := router.Group("/login")
@@ -25,5 +33,8 @@ func Routers() {
 	protectedShorted.POST("/", controller.CreateUrlShorted)
 	protectedShorted.DELETE("/:url", controller.DeleteUrlShorted)
 
-	router.Run("localhost:8080")
+	redirect := router.Group("/")
+	redirect.GET("/:url", controller.RedirectUrl)
+
+	router.Run(host)
 }
