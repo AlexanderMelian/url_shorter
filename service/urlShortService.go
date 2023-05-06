@@ -26,11 +26,14 @@ func SaveUrlShorted(urlShorted string, url string, uId uint) {
 	}
 }
 
-func DeleteUrlShorted(urlShorted string) error {
+func DeleteUrlShorted(urlShorted string, uId uint) error {
 	db := setup.DB
 	row, exist := FindUrlByShorted(urlShorted)
 	if !exist {
 		return errors.New("not found")
+	}
+	if row.UserId != uId {
+		return errors.New("Error now owner")
 	}
 	result := db.Where("id = ?", row.ID).Delete(&row)
 	if result.Error != nil {

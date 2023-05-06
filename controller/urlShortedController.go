@@ -39,8 +39,13 @@ func CreateUrlShorted(c *gin.Context) {
 
 func DeleteUrlShorted(c *gin.Context) {
 	url := c.Param("url")
-	err := service.DeleteUrlShorted(url)
+	uId, err := jwt.GetUserId(c.GetHeader("Authorization"))
 	if err != nil {
+		c.JSON(http.StatusBadRequest, "Error deleting")
+		return
+	}
+	er := service.DeleteUrlShorted(url, uId)
+	if er != nil {
 		c.JSON(http.StatusBadRequest, "Error deleting")
 		return
 	}
