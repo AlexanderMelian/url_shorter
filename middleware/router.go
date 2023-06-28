@@ -5,14 +5,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func Routers() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		return
-	}
 
 	host := os.Getenv("HOST")
 	router := gin.Default()
