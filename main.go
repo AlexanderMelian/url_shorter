@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"localhost/setup"
+	setup "localhost/database"
 
 	"localhost/middleware"
 )
@@ -11,6 +11,9 @@ import (
 func main() {
 
 	fmt.Print("Hello World")
-	setup.Connect()
+	err := setup.Connect()
+	if err != nil {
+		panic(err)
+	}
 	middleware.Routers()
 }

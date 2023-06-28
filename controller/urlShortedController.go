@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func CreateUrlShorted(c *gin.Context) {
@@ -32,7 +31,11 @@ func CreateUrlShorted(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "Bad Auth")
 		return
 	}
-	service.SaveUrlShorted(hashedUrl, input.Url, uId)
+	err = service.SaveUrlShorted(hashedUrl, input.Url, uId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, "Error saving")
+		return
+	}
 	link := buildUrl(hashedUrl)
 	c.JSON(http.StatusOK, link)
 }
@@ -66,11 +69,6 @@ func generateShortUrl(url string) string {
 }
 
 func buildUrl(password string) string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-
 	host := os.Getenv("HOST")
 
 	var builder strings.Builder

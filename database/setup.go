@@ -1,10 +1,9 @@
-package setup
+package database
 
 import (
 	"localhost/models"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -12,11 +11,6 @@ import (
 var DB *gorm.DB
 
 func Connect() error {
-	err := godotenv.Load(".env")
-	if err != nil {
-		return err
-	}
-
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUsername := os.Getenv("DB_USERNAME")
@@ -32,8 +26,11 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
-	database.AutoMigrate(&models.User{})
-	database.AutoMigrate(&models.TinyUrl{})
+	err = database.AutoMigrate(&models.User{}, &models.TinyUrl{})
+	if err != nil {
+		return err
+	}
+
 	DB = database
 	return nil
 }

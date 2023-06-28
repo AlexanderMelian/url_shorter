@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"localhost/database"
 	"localhost/service"
 	"net/http"
 
@@ -10,12 +11,12 @@ import (
 func RedirectUrl(c *gin.Context) {
 	url := c.Param("url")
 
-	tinyUrl, find := service.FindUrlByShorted(url)
-	if !find {
+	tinyUrl, err := database.FindUrlModelByShorted(url)
+	if err != nil {
 		c.JSON(http.StatusNotFound, "Not Found")
 	}
 
 	c.Redirect(http.StatusPermanentRedirect, tinyUrl.UrlOriginal)
-	service.UpdateLastUsedFromUrl(*tinyUrl)
+	service.UpdateLastUsedFromUrl(tinyUrl)
 
 }

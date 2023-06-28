@@ -28,6 +28,7 @@ func Handler() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
 func Login(c *gin.Context) {
 	var inp models.LoginInput
 
@@ -40,14 +41,14 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user, flag := service.Login(inp.Username, inp.Password)
+	user, err := service.Login(inp.Username, inp.Password)
 
-	if !flag {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, "BAD REQUEST")
 		return
 	}
 
-	jwt, err := jwt.GenerateJWT(*user)
+	jwt, err := jwt.GenerateJWT(user)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "Error jwt generation")

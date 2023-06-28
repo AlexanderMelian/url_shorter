@@ -10,17 +10,15 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 )
 
 var secretKey []byte
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic("couldn't load")
-	}
 	secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+	if secretKey == nil {
+		panic("Could not load JWT secret key")
+	}
 }
 
 func GenerateJWT(u models.User) (string, error) {
@@ -51,7 +49,7 @@ func ValidateAuthToken(signedToken string) error {
 	)
 
 	if er != nil {
-		return er
+		return errors.New("error generating token")
 	}
 	if !token.Valid {
 		return errors.New("TOKEN NOT VALID")
@@ -73,9 +71,9 @@ func GetUserId(signedToken string) (uint, error) {
 	if name == "" {
 		return 0, errors.New("invalid token payload")
 	}
-	uId, find := service.FindByUsername(name)
-	if !find {
-		return 0, errors.New("Invalid username")
+	uId, err := service.FindByUsername(name)
+	if err != nil {
+		return 0, err
 	}
 	return uId.ID, nil
 }

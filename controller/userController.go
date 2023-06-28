@@ -18,9 +18,9 @@ func UserController(c *gin.Context) {
 
 func FindAllUsers(c *gin.Context) {
 
-	users, flag := service.FindAllUsers()
+	users, err := service.FindAllUsers()
 
-	if !flag {
+	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"users": "Not found"})
 	}
 
@@ -34,9 +34,9 @@ func FindUserById(c *gin.Context) {
 		c.String(http.StatusBadRequest, "BAD REQUEST")
 	}
 
-	user, flag := service.FindUserById(uint(id))
+	user, err := service.FindUserById(uint(id))
 
-	if !flag {
+	if err != nil {
 		c.String(http.StatusOK, "NOT FOUND")
 	}
 
@@ -50,20 +50,26 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "Bad Json")
 		return
 	}
-	if input.Username == "" || input.Password == "" || input.Name != "" {
+	if input.Username == "" || input.Password == "" || input.Name == "" || input.Email == "" {
 		c.JSON(http.StatusBadRequest, "Input error")
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), 8)
 	if err != nil {
+		println("HASH ERROR")
 		c.JSON(http.StatusBadRequest, "Input error")
 		return
 	}
 
 	//user := models.User{Username: input.Username, Name: input.Name, LastName: input.LastName, Password: string(hashedPassword)}
 	input.Password = string(hashedPassword)
-	service.CreateUser(input)
+	err = service.CreateUser(input)
 
-	c.JSON(http.StatusOK, "")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, "Input error")
+		return
+	}
+
+	c.JSON(http.StatusOK, "User created")
 }

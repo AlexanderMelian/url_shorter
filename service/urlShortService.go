@@ -2,16 +2,12 @@ package service
 
 import (
 	"errors"
-	"fmt"
+	"localhost/database"
 	"localhost/models"
-	"localhost/setup"
 	"time"
-
-	"gorm.io/gorm"
 )
 
-func SaveUrlShorted(urlShorted string, url string, uId uint) {
-	db := setup.DB
+func SaveUrlShorted(urlShorted string, url string, uId uint) error {
 	tinyUrl := &models.TinyUrl{
 		UrlShorted:  urlShorted,
 		UrlOriginal: url,
@@ -19,43 +15,37 @@ func SaveUrlShorted(urlShorted string, url string, uId uint) {
 		UserId:      uId,
 	}
 
-	result := db.Create(tinyUrl)
-
-	if result.Error != nil {
-		panic(result.Error)
+	err := database.SaveUrlShorted(*tinyUrl)
+	if err != nil {
+		return err
 	}
+	return nil
 }
 
 func DeleteUrlShorted(urlShorted string, uId uint) error {
-	db := setup.DB
-	row, exist := FindUrlByShorted(urlShorted)
-	if !exist {
+	row, err := database.FindUrlModelByShorted(urlShorted)
+	if err != nil {
 		return errors.New("not found")
 	}
 	if row.UserId != uId {
-		return errors.New("Error now owner")
+		return errors.New("error non owner")
 	}
-	result := db.Where("id = ?", row.ID).Delete(&row)
-	if result.Error != nil {
+	err = database.DeleteUrlShorted(row)
+	if err != nil {
 		return errors.New("error deleting url")
 	}
 	return nil
 }
 
-func FindUrlByShorted(shorted string) (*models.TinyUrl, bool) {
-	db := setup.DB
-	var sh models.TinyUrl
-	result := db.Where("url_shorted = ?", shorted).First(&sh)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, false
+func FindUrlByShorted(shorted string) (string, error) {
+	url, err := database.FindUrlByShorted(shorted)
+	if err != nil {
+		return "", err
 	}
-	return &sh, true
-
+	return url, nil
 }
 
 func UpdateLastUsedFromUrl(urlModel models.TinyUrl) {
-	db := setup.DB
 	urlModel.LastUsed = time.Now()
-	fmt.Println(urlModel)
-	db.Save(&urlModel)
+	database.UpdateLastUsedFromUrl(urlModel)
 }
